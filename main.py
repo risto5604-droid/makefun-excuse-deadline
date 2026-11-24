@@ -20,6 +20,12 @@ def main():
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8") as f:
         f.write(LINE)
+    # Read-back check: a silent short write or a truncated file would
+    # otherwise pass unnoticed and submit a corrupted entry. Fail loudly
+    # if what landed on disk is not byte-for-byte the entry line.
+    with open("/output/entry.txt", "r", encoding="utf-8") as f:
+        written = f.read()
+    assert written == LINE, "read-back mismatch: /output/entry.txt differs from LINE"
 
 if __name__ == "__main__":
     main()
